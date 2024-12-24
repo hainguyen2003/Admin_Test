@@ -44,11 +44,14 @@ import StatisticExam from "./Page/Statistics/StatisticExam";
 import ChangePassword from "./Components/Modal/ChangePassword";
 import CollapseExam from "./Page/MockTest/CollapseExam";
 
-import ConsultingRegister1 from "./Components/Table/CourseInformation/CourseInformation";
-import DetailConsultingRegister1 from "./Components/Details/CourseInformation/CourseInformation";
 import TableAdmissions from "./Components/Table/Admission/Admission";
 import DetailAdmission from "./Components/Details/DetailAdmission/DetailAdmission";
+
 import DashBoard from "./Components/Table/DashBoard/DashBoard";
+
+import CourseRegister1 from "./Components/Table/CourseInformation/CourseInformation";
+import DetailCourseRegister1 from "./Components/Details/CourseInformation/CourseInformation";
+
 
 // import Editor from "./Components/CKEditor/CKEditor";
 
@@ -334,12 +337,12 @@ export const router = createBrowserRouter([
         ],
       },
       {
-        path: "consultingRegister1",
-        element: <ConsultingRegister1 />,
+        path: "courseRegister1",
+        element: <CourseRegister1 />,
         children: [
           {
-            path: "detailConsultingRegister1/:detailConsultingRegister1Id",
-            element: <DetailConsultingRegister1 />,
+            path: "detailCourseRegister1/:detailCourseRegister1Id",
+            element: <DetailCourseRegister1 />,
           },
         ],
       },
