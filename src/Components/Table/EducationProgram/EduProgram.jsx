@@ -2,9 +2,10 @@ import {
   EditOutlined,
   FilterOutlined,
   SolutionOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
-import { PageContainer, useEditableArray } from "@ant-design/pro-components";
-import { Button, Drawer, Input, Modal, Popover, Space, Table } from "antd";
+import { PageContainer } from "@ant-design/pro-components";
+import { Button, Drawer, Input, Popover, Space, Table } from "antd";
 import React, { useEffect, useState } from "react";
 import AddEditEp from "../../AddEdit/AddEditEP/AddEditEp";
 import { filterService, getListService } from "../../../Services/lead";
@@ -13,11 +14,11 @@ import DetailEdu from "../../Details/DetailEdu/DetailEdu";
 import FilterService from "../../FormFilter/FilterEdu";
 
 function EduProgram(props) {
-  const [openDrawer, setOpenDrawer] = useState();
-  const [searchData, setSearchData] = useState();
-  const [currentEP, setCurrentEP] = useState([]);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [searchData, setSearchData] = useState("");
+  const [currentEP, setCurrentEP] = useState({});
   const [clicked, setClicked] = useState(false);
-  const [openModal, setOpenModal] = useState();
+  const [openModal, setOpenModal] = useState(false);
   const [data, setData] = useState([]);
   const navigate = useNavigate();
 
@@ -29,14 +30,14 @@ function EduProgram(props) {
     setClicked(open);
   };
 
-  // getALl
+  // Lấy toàn bộ chương trình
   const handleGetEP = () => {
     getListService().then((res) => {
-      setData(res?.data?.data?.items);
+      setData(res?.data?.data?.items || []);
     });
   };
 
-  // Lọc từ bảng service các dữ liệu thuộc EP
+  // Lọc chương trình
   const dataED = data.filter(
     (Edu) =>
       Edu.typeOfService === "EDUCATION_PROGRAM" ||
@@ -48,22 +49,18 @@ function EduProgram(props) {
   };
 
   const handleSearchEdu = (values) => {
-    filterService({
-      name: values,
-    }).then((res) => {
+    filterService({ name: values }).then((res) => {
       if (res.status === 200) {
-        setData(res?.data?.data?.items);
+        setData(res?.data?.data?.items || []);
       }
     });
   };
 
-  // Hàm lọc
+  // Lọc nâng cao
   const handleFilter = (values) => {
-    console.log("values:: ", values);
     filterService(values).then((res) => {
-      console.log("res", res);
       if (res?.status === 200) {
-        setData(res?.data?.data?.items);
+        setData(res?.data?.data?.items || []);
       }
     });
   };
@@ -85,7 +82,6 @@ function EduProgram(props) {
       title: "Số buổi",
       dataIndex: "numberTeachingSessions",
     },
-
     {
       title: "Hình thức học",
       dataIndex: "learningForm",
@@ -94,11 +90,10 @@ function EduProgram(props) {
       title: "Loại dịch vụ",
       dataIndex: "typeOfService",
     },
-
     {
       title: "Action",
       key: "action",
-      render: (e, record, idx) => (
+      render: (e, record) => (
         <Space>
           <Button
             className="update"
@@ -107,7 +102,7 @@ function EduProgram(props) {
               setCurrentEP(record);
               setOpenModal(true);
             }}
-          ></Button>
+          />
           <Button
             className="detail"
             icon={<SolutionOutlined />}
@@ -115,49 +110,62 @@ function EduProgram(props) {
               setOpenDrawer(true);
               navigate(`/adminpage/eduprogram/detaileduprogram/${record.id}`);
             }}
-          ></Button>
+          />
         </Space>
       ),
     },
   ];
+
   return (
     <div>
       <PageContainer
-        title="Các chương trình Anh ngữ"
+        title="Các chương trình Anh ngữ và tin học"
         extra={[
-          <Input.Search
-            placeholder="Nhập tên chương trình"
-            onChange={handleSearch}
-            value={searchData}
-            onSearch={(values) => {
-              handleSearchEdu(values);
-            }}
-          />,
-          <Popover
-            content={
-              <FilterService
-                onSearch={(values) => {
-                  handleFilter(values);
-                }}
-                hide={hide}
-              />
-            }
-            trigger="click"
-            open={clicked}
-            onOpenChange={handleClick}
-          >
-            <Button className="border-1677ff text-1677ff">
-              <FilterOutlined />
-              Lọc
+          <Space>
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => {
+                setOpenModal(true);
+                setCurrentEP({}); // Reset dữ liệu khi thêm mới
+              }}
+            >
+              Thêm chương trình
             </Button>
-          </Popover>,
+            <Input.Search
+              placeholder="Nhập tên chương trình"
+              onChange={handleSearch}
+              value={searchData}
+              onSearch={(values) => {
+                handleSearchEdu(values);
+              }}
+            />
+            <Popover
+              content={
+                <FilterService
+                  onSearch={(values) => {
+                    handleFilter(values);
+                  }}
+                  hide={hide}
+                />
+              }
+              trigger="click"
+              open={clicked}
+              onOpenChange={handleClick}
+            >
+              <Button className="border-1677ff text-1677ff">
+                <FilterOutlined />
+                Lọc
+              </Button>
+            </Popover>
+          </Space>,
         ]}
       >
         {/* Thêm + cập nhật chương trình */}
         <AddEditEp
           onSuccess={() => {
-            handleGetEP();
-            setOpenModal(false);
+            handleGetEP(); // Làm mới danh sách sau khi thêm
+            setOpenModal(false); // Đóng modal
           }}
           openModal={openModal}
           onOpenChange={(open) => {
@@ -166,7 +174,7 @@ function EduProgram(props) {
               setCurrentEP({});
             }
           }}
-          data={currentEP}
+          data={currentEP} // Truyền dữ liệu chỉnh sửa hoặc rỗng khi thêm mới
         />
         <Table
           columns={columns}

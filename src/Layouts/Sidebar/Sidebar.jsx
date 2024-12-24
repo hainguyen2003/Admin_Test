@@ -110,7 +110,7 @@ function Sidebar(props) {
       ],
     },
     {
-      label: "Chương trình Anh ngữ",
+      label: "CT Anh ngữ & Tin Học",
       key: "4",
       icon: <ReadOutlined />,
       onClick: () => {
