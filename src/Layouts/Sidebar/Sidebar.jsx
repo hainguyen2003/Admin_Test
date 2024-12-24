@@ -46,7 +46,7 @@ function Sidebar(props) {
     if (pathname.includes("/adminpage/consultingRegister")) {
       return "5";
     }
-    if (pathname.includes("/adminpage/coursegRegister1")) {
+    if (pathname.includes("/adminpage/courseRegister1")) {
       return "6";
     }
     
@@ -130,7 +130,7 @@ function Sidebar(props) {
       key: "6",
       icon: <ReadOutlined />,
       onClick: () => {
-        navigate("/adminpage/consultingRegister1");
+        navigate("/adminpage/courseRegister1");
       },
     },
 
