@@ -49,7 +49,7 @@ function Sidebar(props) {
     if (pathname.includes("/adminpage/courseRegister1")) {
       return "6";
     }
-    
+
     if (pathname.includes("/adminpage/examschedule")) {
       return "7";
     }
@@ -62,7 +62,7 @@ function Sidebar(props) {
     if (pathname.includes("/adminpage/admissions")) {
       return "10"; // Key của mục "Chương trình"
     }
-    
+
     if (pathname.includes("/adminpage/document")) {
       return "11";
     }
@@ -74,6 +74,9 @@ function Sidebar(props) {
     }
     if (pathname.includes("/adminpage/displayprogram")) {
       return "17";
+    }
+    if (pathname.includes("/adminpage/dashboard")) {
+      return "18"; // Key của mục "Chương trình"
     }
   };
   const items = [
@@ -174,6 +177,15 @@ function Sidebar(props) {
       icon: <ReadOutlined />,
       onClick: () => {
         navigate("/adminpage/document");
+      },
+    },
+
+    {
+      label: "Thống kê",
+      key: "18",
+      icon: <ReadOutlined />,
+      onClick: () => {
+        navigate("/adminpage/dashboard");
       },
     },
     // {
