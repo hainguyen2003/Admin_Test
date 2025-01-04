@@ -556,3 +556,48 @@ export const getProfileUser = () => {
 export const getDashboard = (year) => {
   return axios.get(`/auth/dashboard/${year}`);
 };
+
+//********************* Oder *********************
+export const getOder = () => {
+  return axios.get(`/order/all`);
+};
+
+export const updateOrderStatus = async (orderId, status) => {
+  return axios.post(`/order/${orderId}/update-status`, null, {
+    params: { status },
+  });
+};
+
+export const getPaidUsers = () => {
+  return axios.get(`/order/paid`);
+};
+
+//  get detail User
+export const getInforOder = (orderId) => {
+  return axios.get(`/order/${orderId}`);
+};
+
+//*************Class ******************
+export const getClass = () => {
+  return axios.get(`/classRoom/all`);
+};
+
+// API create Class
+export const createClass = (values) => {
+  return axios.post("/classRoom/create", values);
+};
+
+//  get detail Class
+export const getInforClass = (id) => {
+  return axios.get(`/classRoom/${id}`);
+};
+
+// Update infor Class
+export const updateClass = (id, values) => {
+  return axios.put(`/classRoom/update/${id}`, values);
+};
+
+// Delete each Class
+export const deleteClass = (id) => {
+  return axios.delete(`/classRoom/delete/${id}`);
+};

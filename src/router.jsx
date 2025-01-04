@@ -52,6 +52,14 @@ import DashBoard from "./Components/Table/DashBoard/DashBoard";
 import CourseRegister1 from "./Components/Table/CourseInformation/CourseInformation";
 import DetailCourseRegister1 from "./Components/Details/CourseInformation/CourseInformation";
 
+// order
+
+import TableOrder from "./Components/Order/TableOrder";
+import DetailOrder from "./Components/Details/Order/DetailOrder";
+
+//class
+import TableClass from "./Components/Order/TableClass";
+import TablePaidUser from "./Components/Order/TablePaidUser";
 
 // import Editor from "./Components/CKEditor/CKEditor";
 
@@ -345,6 +353,24 @@ export const router = createBrowserRouter([
             element: <DetailCourseRegister1 />,
           },
         ],
+      },
+      {
+        path: "TableOrder",
+        element: <TableOrder />,
+        children: [
+          {
+            path: "detailOrder/:detailOrderId",
+            element: <DetailOrder />,
+          },
+        ],
+      },
+      {
+        path: "TableClass",
+        element: <TableClass />,
+      },
+      {
+        path: "TablePaidUser",
+        element: <TablePaidUser />,
       },
     ],
   },

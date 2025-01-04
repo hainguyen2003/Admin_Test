@@ -157,7 +157,13 @@ function Document(props) {
             className="delete"
             icon={<DeleteOutlined />}
             onClick={() => {
-              handleDelete(record.id);
+              Modal.confirm({
+                title: "Bạn muốn xóa tài liệu này không?",
+                okText: "Xác nhận",
+                cancelText: "Hủy",
+                onOk: () => handleDelete(record.id),
+                onCancel: () => console.log("Hủy xóa"),
+              });
             }}
           ></Button>
           <Button
