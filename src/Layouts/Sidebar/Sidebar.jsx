@@ -78,6 +78,15 @@ function Sidebar(props) {
     if (pathname.includes("/adminpage/dashboard")) {
       return "18"; // Key của mục "Chương trình"
     }
+    if (pathname.includes("/adminpage/order")) {
+      return "19"; // Key của mục "Chương trình"
+    }
+    if (pathname.includes("/adminpage/class")) {
+      return "20";
+    }
+    if (pathname.includes("/adminpage/TablePaidUser")) {
+      return "21";
+    }
   };
   const items = [
     {
@@ -188,6 +197,32 @@ function Sidebar(props) {
         navigate("/adminpage/dashboard");
       },
     },
+
+    {
+      label: "Đơn hàng",
+      key: "19",
+      icon: <ReadOutlined />,
+      onClick: () => {
+        navigate("/adminpage/TableOrder");
+      },
+    },
+    {
+      label: "Quản lý lớp học",
+      key: "20",
+      icon: <ReadOutlined />,
+      onClick: () => {
+        navigate("/adminpage/TableClass");
+      },
+    },
+    {
+      label: "Quản lý học viên",
+      key: "21",
+      icon: <ReadOutlined />,
+      onClick: () => {
+        navigate("/adminpage/TablePaidUser");
+      },
+    },
+
     // {
     //   label: "Thi thử ",
     //   key: "mocktest",
