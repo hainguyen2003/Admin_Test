@@ -180,7 +180,7 @@ function TableClass() {
         dataSource={data}
         size="middle"
         pagination={{
-          pageSize: 3,
+          pageSize: 5,
         }}
       />
       {showDetail && (

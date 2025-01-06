@@ -601,3 +601,8 @@ export const updateClass = (id, values) => {
 export const deleteClass = (id) => {
   return axios.delete(`/classRoom/delete/${id}`);
 };
+
+// create user class
+export const createClassUser = (values) => {
+  return axios.post("/class-user/create", values);
+};

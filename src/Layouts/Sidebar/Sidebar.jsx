@@ -130,14 +130,6 @@ function Sidebar(props) {
       },
     },
     {
-      label: "Đăng ký tư vấn",
-      key: "5",
-      icon: <ReadOutlined />,
-      onClick: () => {
-        navigate("/adminpage/consultingRegister");
-      },
-    },
-    {
       label: "Đăng ký khóa học",
       key: "6",
       icon: <ReadOutlined />,
