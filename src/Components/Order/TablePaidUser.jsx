@@ -2,7 +2,8 @@ import { PageContainer } from "@ant-design/pro-components";
 import { Button, Input, Modal, Space, Table, Select, message } from "antd";
 import React, { useState, useEffect } from "react";
 import { EditOutlined } from "@ant-design/icons";
-import { getPaidUsers, getClass } from "../../Services/lead"; // Import API getClass
+
+import { getPaidUsers, getClass, getInforService } from "../../Services/lead"; // Import API getClass
 
 function TablePaidUsers() {
   const [paidUsers, setPaidUsers] = useState([
@@ -29,21 +30,48 @@ function TablePaidUsers() {
   const [editingRecord, setEditingRecord] = useState(null); // Bản ghi đang được chỉnh sửa
   const [selectedClass, setSelectedClass] = useState(""); // Lớp học được chọn
   const { confirm } = Modal;
-
   // Gọi API để lấy danh sách lớp học
   useEffect(() => {
     getPaidUsers()
       .then((res) => {
         const data = res?.data;
         if (Array.isArray(data)) {
-          setPaidUsers(
-            data.map((user) => ({
-              id: user.id,
-              name: user.fullName,
-              receivedDate: user.paymentDate,
-              class: user.classAssigned || "Chưa có",
-            }))
-          );
+          // Map danh sách học viên đã thanh toán
+          const users = data.map((user) => ({
+            id: user.id,
+            name: user.fullName,
+            serviceManagerId: user.serviceManagerId,
+            receivedDate: user.paymentDate,
+            class: user.classAssigned || "Chưa có",
+            courseName: "Đang tải...", // Giá trị mặc định ban đầu
+          }));
+
+          // Cập nhật danh sách ban đầu
+          setPaidUsers(users);
+
+          // Gọi API để lấy thông tin khóa học
+          const updatedUsersPromises = users.map((user) => {
+            return getInforService(user.serviceManagerId)
+              .then((serviceInfo) => {
+                return {
+                  ...user,
+                  courseName:
+                    serviceInfo?.data?.data?.name || "Không có tên khóa học",
+                };
+              })
+              .catch((error) => {
+                console.error(
+                  `Lỗi khi lấy thông tin dịch vụ cho ID: ${user.serviceManagerId}`,
+                  error
+                );
+                return { ...user, courseName: "Lỗi khi tải" };
+              });
+          });
+
+          // Chờ tất cả các API hoàn thành và cập nhật lại danh sách
+          Promise.all(updatedUsersPromises).then((updatedUsers) => {
+            setPaidUsers(updatedUsers);
+          });
         } else {
           console.error("Dữ liệu không hợp lệ:", data);
           setPaidUsers([]);
@@ -87,6 +115,11 @@ function TablePaidUsers() {
       title: "Tên",
       dataIndex: "name",
       key: "name",
+    },
+    {
+      title: "Tên khóa học đã mua",
+      dataIndex: "courseName",
+      key: "courseName",
     },
     {
       title: "Ngày nhận tài liệu",

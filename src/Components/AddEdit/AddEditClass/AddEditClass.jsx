@@ -14,8 +14,7 @@ function AddEditClass({ onSuccess, openModal, data, onOpenChange }) {
 
   const handleCreateClass = (values) => {
     createClass(values).then((res) => {
-      console.log("Response from API:", res);
-      if (res?.data?.success === true) {
+      if (res.data && res.status === 200) {
         message.success("Tạo lớp học thành công");
         onSuccess();
       } else if (res?.data?.error?.statusCode === 2) {
@@ -30,7 +29,7 @@ function AddEditClass({ onSuccess, openModal, data, onOpenChange }) {
 
   const handleUpdateClass = (values) => {
     updateClass(data.classId, values).then((res) => {
-      if (res?.data?.success === true) {
+      if (res.data && res.status === 200) {
         message.success("Cập nhật lớp học thành công");
         onSuccess();
       } else {
