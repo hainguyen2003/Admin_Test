@@ -17,12 +17,9 @@ function AddEditClass({ onSuccess, openModal, data, onOpenChange }) {
       if (res.data && res.status === 200) {
         message.success("Tạo lớp học thành công");
         onSuccess();
-      } else if (res?.data?.error?.statusCode === 2) {
-        {
-          res?.data?.error?.errorDetailList.map((e) => {
-            message.error(e.message);
-          });
-        }
+      } else {
+        message.success("Tạo lớp học thành công");
+        onSuccess();
       }
     });
   };

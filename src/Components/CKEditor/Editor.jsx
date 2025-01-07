@@ -157,6 +157,20 @@ function Editor({ onChange, initialValues }) {
           link: {
             addTargetToExternalLinks: true, // Mở liên kết bên ngoài trong tab mới (optional)
           },
+          htmlSupport: {
+            allow: [
+              {
+                name: /.*/,
+                attributes: true,
+                classes: true,
+                styles: true,
+              },
+            ],
+            disallow: [],
+          },
+          htmlEmbed: {
+            showPreviews: true,
+          },
 
           extraPlugins: [uploadPlugin],
         }}

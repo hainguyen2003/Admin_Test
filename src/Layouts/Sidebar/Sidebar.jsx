@@ -87,6 +87,9 @@ function Sidebar(props) {
     if (pathname.includes("/adminpage/TablePaidUser")) {
       return "21";
     }
+    if (pathname.includes("/adminpage/seo")) {
+      return "22";
+    }  
   };
   const items = [
     {
@@ -212,6 +215,14 @@ function Sidebar(props) {
       icon: <ReadOutlined />,
       onClick: () => {
         navigate("/adminpage/TablePaidUser");
+      },
+    },
+    {
+      label: "SEO",
+      key: "22",
+      icon: <FileTextOutlined />,
+      onClick: () => {
+        navigate("/adminpage/seo"); 
       },
     },
 

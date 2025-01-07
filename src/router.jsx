@@ -12,6 +12,7 @@ import ExamSchedule from "./Components/Table/ExamSchedule/ExamSchedule";
 import Document from "./Components/Table/Document/Document";
 import DetailDoc from "./Components/Details/DetailDoc/DetailDoc";
 import DetailES from "./Components/Details/DetailES/DetailES";
+import TableSeo from "./Components/Table/SEO/SEO";
 import DetailNews from "./Components/Details/DetailNews/DetailNews";
 import ReviewShedule from "./Components/Table/ReviewSchedule/ReviewShedule";
 import DisplayHome from "./Components/Table/DisplayManager/DisplayHome/DisplayHome";
@@ -153,6 +154,10 @@ export const router = createBrowserRouter([
             element: <DetailNews />,
           },
         ],
+      },
+      {
+        path: "seo",
+        element: <TableSeo />
       },
       {
         path: "admissions",
