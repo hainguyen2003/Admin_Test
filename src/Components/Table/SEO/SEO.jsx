@@ -13,14 +13,18 @@ const SEO = () => {
   const handleGenerateContent = async (values) => {
     setLoading(true);
     try {
-      const userInput = `Tên tin tức: ${values.newsTitle}, Từ khóa chính: ${values.mainKeyword}, Từ khóa phụ: ${values.secondaryKeyword}, Chủ đề: ${values.topic}, Người đọc mục tiêu: ${values.targetAudience}`;
-
       const response = await fetch(CHAT_SERVER_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userInput }),
+        body: JSON.stringify({
+          newsTitle: values.newsTitle,
+          outline: values.outline,
+          mainKeyword: values.mainKeyword,
+          topic: values.topic,
+          targetAudience: values.targetAudience,
+        }),
       });
 
       const data = await response.json();
@@ -36,6 +40,7 @@ const SEO = () => {
     }
     setLoading(false);
   };
+
 
   const handleCopyContent = () => {
     const allContent = contentIdeas.join("\n");
@@ -63,7 +68,7 @@ const SEO = () => {
           style={{
             flex: "1 1 calc(50% - 20px)",
             minWidth: "300px",
-            maxWidth: "500px", // Fix width để không thay đổi
+            maxWidth: "500px",
             padding: "20px",
           }}
         >
@@ -85,10 +90,23 @@ const SEO = () => {
               <Input placeholder="Nhập từ khóa chính" />
             </Form.Item>
 
-            <Form.Item label="Từ khóa phụ" name="secondaryKeyword">
-              <Input placeholder="Nhập từ khóa phụ" />
+            <Form.Item
+              label="Dàn ý"
+              name="outline"
+              rules={[{ required: true, message: "Vui lòng nhập dàn ý!" }]}
+            >
+              <Input.TextArea
+                placeholder="Nhập dàn ý"
+                rows={4}
+                style={{
+                  fontSize: "16px", // Tăng kích thước chữ
+                  padding: "10px", // Thêm padding
+                  lineHeight: "1.5", // Giãn cách dòng
+                  borderRadius: "8px", // Bo góc
+                  border: "1px solid #d9d9d9", // Màu viền
+                }}
+              />
             </Form.Item>
-
             <Form.Item
               label="Chủ đề"
               name="topic"
