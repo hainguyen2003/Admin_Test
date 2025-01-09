@@ -6,11 +6,12 @@ import {
   ProFormText,
   ProFormUploadButton,
 } from "@ant-design/pro-components";
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   createDocument,
   updateDocument,
   uploadFile,
+  getListService,
 } from "../../../Services/lead";
 import { message, notification } from "antd";
 import _ from "lodash";
@@ -21,7 +22,29 @@ function AddEditDocument({ onSuccess, openModal, data, onOpenChange }) {
   const [listImage, setListImage] = useState([]);
   const [fieldFile, setFieldFile] = useState("");
   const [fieldImage, setFieldImage] = useState("");
+  const [services, setServices] = useState([]); // Khai báo danh sách khóa học
   const formRef = useRef(null);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await getListService();
+        if (response?.data?.success) {
+          const serviceOptions = response?.data?.data?.items.map((service) => ({
+            label: service.name, // Tên khóa học
+            value: service.id, // ID khóa học
+          }));
+          setServices(serviceOptions);
+        } else {
+          message.error("Không thể tải danh sách khóa học");
+        }
+      } catch (error) {
+        console.error("Failed to fetch services:", error);
+        message.error("Đã xảy ra lỗi khi tải danh sách khóa học");
+      }
+    };
+    fetchServices();
+  }, []);
 
   const handleCreatDocument = (values) => {
     createDocument(values).then((res) => {
@@ -128,7 +151,6 @@ function AddEditDocument({ onSuccess, openModal, data, onOpenChange }) {
             valueEnum={{
               0: "FREE",
               1: "NO_FREE",
-             
             }}
             label="Trạng thái"
             placeholder="Trạng thái"
@@ -136,6 +158,20 @@ function AddEditDocument({ onSuccess, openModal, data, onOpenChange }) {
               {
                 required: true,
                 message: "Trạng thái không để trống",
+              },
+            ]}
+          />
+          <ProFormSelect
+            width="md"
+            name="idService" // Đổi tên key để khớp với field trong database
+            label="Khóa học"
+            placeholder="Chọn khóa học"
+            options={services} // Danh sách các khóa học đã fetch từ API
+            initialValue={data?.idService} // Giá trị mặc định là mã khóa học từ database
+            rules={[
+              {
+                required: true,
+                message: "Vui lòng chọn khóa học",
               },
             ]}
           />

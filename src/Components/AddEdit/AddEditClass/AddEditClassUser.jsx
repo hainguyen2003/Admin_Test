@@ -7,13 +7,13 @@ import {
 } from "@ant-design/pro-components";
 import React, { useRef, useState } from "react";
 import { message } from "antd";
-import { createClass, updateClass } from "../../../Services/lead";
+import { createClassUser, updateUserClass } from "../../../Services/lead";
 
 function AddEditClass({ onSuccess, openModal, data, onOpenChange }) {
   const formRef = useRef(null);
 
   const handleCreateClass = (values) => {
-    createClass(values).then((res) => {
+    createClassUser(values).then((res) => {
       if (res.data && res.status === 200) {
         message.success("Tạo lớp học thành công");
         onSuccess();
@@ -25,7 +25,7 @@ function AddEditClass({ onSuccess, openModal, data, onOpenChange }) {
   };
 
   const handleUpdateClass = (values) => {
-    updateClass(data.classId, values).then((res) => {
+    updateUserClass(data.classId, values).then((res) => {
       if (res.data && res.status === 200) {
         message.success("Cập nhật lớp học thành công");
         onSuccess();

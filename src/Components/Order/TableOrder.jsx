@@ -25,13 +25,6 @@ function TableOrder(props) {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
-
-  const handleViewDetail = (orderId) => {
-    console.log("Selected Order ID:", orderId); // Kiểm tra orderId
-    setSelectedOrderId(orderId);
-    setIsModalVisible(true);
-  };
-
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
