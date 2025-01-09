@@ -1,11 +1,19 @@
 import { PageContainer } from "@ant-design/pro-components";
-import { Button, Drawer, Input, Modal, Popover, Space, Table } from "antd";
+import {
+  Button,
+  Drawer,
+  Input,
+  Modal,
+  Popover,
+  Space,
+  Table,
+  Tooltip,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   CloseOutlined,
   DeleteOutlined,
-  DownOutlined,
   EditOutlined,
   FilterOutlined,
   SolutionOutlined,
@@ -20,14 +28,14 @@ import {
 import DetailNews from "../../Details/DetailNews/DetailNews";
 import FilterNews from "../../FormFilter/FilterNews";
 
-function TableNews(props) {
+function TableNews() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dataNews, setDataNews] = useState([]);
-  const [openModal, setOpenModal] = useState();
+  const [openModal, setOpenModal] = useState(false);
   const [currentNews, setCurrentNews] = useState({});
-  const [openDrawer, setOpenDrawer] = useState();
-  const [searchData, setSearchData] = useState();
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [searchData, setSearchData] = useState("");
   const [clicked, setClicked] = useState(false);
   const navigate = useNavigate();
   const { confirm } = Modal;
@@ -35,14 +43,15 @@ function TableNews(props) {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
 
-  const showhowConfirm = () => {
+  const showConfirm = () => {
     confirm({
-      title: "Xoá tin tức ",
+      title: "Xoá tin tức",
       content: "Việc này sẽ xóa tin tức được chọn. Bạn có chắc chắn muốn xóa?",
       onOk: handleDeleteAll,
       onCancel() {
@@ -59,15 +68,14 @@ function TableNews(props) {
     setClicked(open);
   };
 
-  // Hàm lấy thông tin Tin Tức
   const handleGetNews = () => {
     setLoading(true);
     getListNews().then((res) => {
-      setDataNews(res?.data?.data?.items);
+      setDataNews(res?.data?.data?.items || []);
+      setLoading(false);
     });
   };
 
-  // delete each news
   const handleDelNews = (id) => {
     deleteNews(id).then((res) => {
       if (res.status === 200) {
@@ -75,7 +83,7 @@ function TableNews(props) {
       }
     });
   };
-  const hasSelected = selectedRowKeys.length > 0;
+
   const handleDeleteAll = () => {
     delAllNews(selectedRowKeys)
       .then((res) => {
@@ -104,11 +112,8 @@ function TableNews(props) {
     });
   };
 
-  // Hàm lọc người dùng
   const handleFilter = (values) => {
-    console.log("values:: ", values);
     filterNews(values).then((res) => {
-      console.log("res", res);
       if (res?.status === 200) {
         setDataNews(res?.data?.data?.items);
       }
@@ -117,7 +122,6 @@ function TableNews(props) {
 
   useEffect(() => {
     handleGetNews();
-    setLoading(false);
   }, []);
 
   const columns = [
@@ -129,11 +133,21 @@ function TableNews(props) {
       title: "Ảnh",
       dataIndex: "image",
       render: (imageURL) => (
-        <img
-          src={imageURL}
-          alt={imageURL}
-          style={{ width: "150px", height: "150px" }}
-        />
+        <div style={{ textAlign: "center" }}>
+          <img
+            src={imageURL || "https://via.placeholder.com/120"}
+            alt="News Image"
+            style={{
+              width: "120px",
+              height: "120px",
+              objectFit: "cover",
+              borderRadius: "8px",
+              border: "1px solid #d9d9d9",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            }}
+            onError={(e) => (e.target.src = "https://via.placeholder.com/120")}
+          />
+        </div>
       ),
     },
     {
@@ -152,41 +166,48 @@ function TableNews(props) {
     {
       title: "Action",
       key: "action",
-      render: (e, record, idx) => (
+      render: (_, record) => (
         <Space>
-          <Button
-            className="update"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setCurrentNews(record);
-              setOpenModal(true);
-            }}
-          ></Button>
-          <Button
-            className="delete"
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              handleDelNews(record.id);
-            }}
-          ></Button>
-          <Button
-            className="detail"
-            icon={<SolutionOutlined />}
-            onClick={() => {
-              setOpenDrawer(true);
-              navigate(`/adminpage/news/detailnews/${record.id}`);
-            }}
-          ></Button>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              className="update"
+              icon={<EditOutlined />}
+              onClick={() => {
+                setCurrentNews(record);
+                setOpenModal(true);
+              }}
+            />
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <Button
+              className="delete"
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                handleDelNews(record.id);
+              }}
+            />
+          </Tooltip>
+          <Tooltip title="Chi tiết">
+            <Button
+              className="detail"
+              icon={<SolutionOutlined />}
+              onClick={() => {
+                setOpenDrawer(true);
+                navigate(`/adminpage/news/detailnews/${record.id}`);
+              }}
+            />
+          </Tooltip>
         </Space>
       ),
     },
   ];
+
   return (
     <div>
       <PageContainer
         title="Tin tức"
         extra={[
-          <Space>
+          <Space key="header-actions">
             <Button
               className="bg-1677ff text-white hover:bg-white"
               onClick={() => {
@@ -195,12 +216,10 @@ function TableNews(props) {
             >
               + Thêm tin tức
             </Button>
-            ,
             <Input.Search
               placeholder="Nhập tên tin tức"
               onChange={handleSearch}
               value={searchData}
-              defaultValue={null}
               onSearch={(values) => {
                 handleSearchNews(values);
               }}
@@ -226,7 +245,6 @@ function TableNews(props) {
           </Space>,
         ]}
       >
-        {/* Hàm tạo + Edit */}
         <AddEditNews
           onSuccess={() => {
             handleGetNews();
@@ -248,16 +266,16 @@ function TableNews(props) {
           dataSource={dataNews}
           size="middle"
           pagination={{
-            pageSize: 3,
+            pageSize: 5,
           }}
           scroll={{
-            y: 413,
+            y: 400,
           }}
-          // loading={loading}
+          loading={loading}
         />
         <Drawer
           title="Thông tin chi tiết tin tức"
-          width={600}
+          width={800}
           open={openDrawer}
           onClose={() => {
             navigate("/adminpage/news");
@@ -268,13 +286,13 @@ function TableNews(props) {
         </Drawer>
         <div
           className="absolute bottom-6"
-          style={{ display: hasSelected ? "block" : "none" }}
+          style={{ display: selectedRowKeys.length > 0 ? "block" : "none" }}
         >
           <>Đã chọn {selectedRowKeys.length}</>
           <Button
             className="bg-white ml-2.5 py-1 px-2.5"
             onClick={() => {
-              showhowConfirm();
+              showConfirm();
             }}
             disabled={selectedRowKeys.length === 0}
           >

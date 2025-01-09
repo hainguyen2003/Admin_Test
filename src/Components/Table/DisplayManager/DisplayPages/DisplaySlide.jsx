@@ -1,28 +1,28 @@
-import { EditOutlined, SolutionOutlined } from "@ant-design/icons";
+import { EditOutlined } from "@ant-design/icons";
 import { PageContainer } from "@ant-design/pro-components";
-import { Button, Space, Table } from "antd";
+import { Button, Space, Table, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
-import { getListDisplay, getListSlide } from "../../../../Services/lead";
+import { getListSlide } from "../../../../Services/lead";
 import { useNavigate } from "react-router-dom";
 import EditSlide from "../../../AddEdit/EditSlide/EditSlide";
+import moment from "moment";
 
-function Slide(props) {
+function Slide() {
   const [loading, setLoading] = useState(true);
-  const [openModal, setOpenModal] = useState();
+  const [openModal, setOpenModal] = useState(false);
   const [data, setData] = useState([]);
   const [currentData, setCurrentData] = useState({});
   const navigate = useNavigate();
 
-  // getAll
-  const handleGetSlide = () => {
-    getListSlide().then((res) => {
-      setData(res?.data?.data?.items);
-    });
+  // Fetch all slides
+  const handleGetSlide = async () => {
+    const res = await getListSlide();
+    setData(res?.data?.data?.items || []);
+    setLoading(false);
   };
 
   useEffect(() => {
     handleGetSlide();
-    setLoading(false);
   }, []);
 
   const columns = [
@@ -30,59 +30,76 @@ function Slide(props) {
       title: "Ảnh",
       dataIndex: "image",
       render: (imageURL) => (
-        <img
-          src={imageURL}
-          alt={imageURL}
-          style={{ width: "100px", height: "100px" }}
-        />
+        <div style={{ textAlign: "center" }}>
+          <img
+            src={imageURL}
+            alt="slide"
+            style={{
+              width: "100px",
+              height: "100px",
+              objectFit: "cover",
+              borderRadius: "8px",
+              border: "1px solid #d9d9d9",
+            }}
+            onError={(e) => (e.target.src = "https://via.placeholder.com/100")}
+          />
+        </div>
       ),
     },
-
     {
       title: "Vị trí ảnh",
       dataIndex: "location",
+      render: (location) => <span>{location || "N/A"}</span>,
     },
     {
       title: "Ngày tạo",
       dataIndex: "createdDate",
+      render: (createdDate) =>
+        createdDate ? moment(createdDate).format("DD/MM/YYYY") : "N/A",
     },
     {
       title: "Ngày cập nhật",
       dataIndex: "updateDate",
+      render: (updateDate) =>
+        updateDate ? moment(updateDate).format("DD/MM/YYYY") : "N/A",
     },
-
     {
-      title: "Action",
+      title: "Hành động",
       key: "action",
-      render: (e, record, idx) => (
+      render: (_, record) => (
         <Space>
-          <Button
-            className="update"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setCurrentData(record);
-              setOpenModal(true);
-            }}
-          ></Button>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              className="update"
+              icon={<EditOutlined />}
+              type="primary"
+              onClick={() => {
+                setCurrentData(record);
+                setOpenModal(true);
+              }}
+            />
+          </Tooltip>
         </Space>
       ),
     },
   ];
+
   return (
     <div>
       <PageContainer
-        title="Quản lý hiển thị slide"
-        extra={[
+        title="Quản lý hiển thị Slide"
+        extra={
           <Space>
             <Button
+              type="default"
               onClick={() => {
                 navigate("/adminpage/displaypages");
               }}
             >
               Quản lý Pages
             </Button>
-          </Space>,
-        ]}
+          </Space>
+        }
       >
         <EditSlide
           onSuccess={() => {
@@ -100,12 +117,13 @@ function Slide(props) {
         />
 
         <Table
-          rowKey={"id"}
+          rowKey="id"
           columns={columns}
           dataSource={data}
           size="middle"
           pagination={{
             pageSize: 5,
+            showSizeChanger: true,
           }}
           scroll={{
             y: 413,
