@@ -102,7 +102,7 @@ function AddEditAdmission({ onSuccess, openModal, data, onOpenChange }) {
         <ProForm.Group>
           <ProFormText
             width="md"
-            title="title"
+            name="title"
             label="Tiêu đề chương trình"
             placeholder="Tiêu đề chương trình"
             rules={[

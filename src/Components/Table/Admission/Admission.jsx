@@ -1,5 +1,15 @@
 import { PageContainer } from "@ant-design/pro-components";
-import { Button, Drawer, Input, Modal, Popover, Space, Table, Tag } from "antd";
+import {
+  Button,
+  Drawer,
+  Input,
+  Modal,
+  Popover,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -19,15 +29,14 @@ import {
 import FilterAdmissions from "../../FormFilter/FilterAdmission";
 import DetailAdmission from "../../Details/DetailAdmission/DetailAdmission";
 
-
-function TableAdmissions(props) {
+function TableAdmissions() {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const [loading, setLoading] = useState(true);
   const [dataAdmission, setDataAdmission] = useState([]);
-  const [openModal, setOpenModal] = useState();
+  const [openModal, setOpenModal] = useState(false);
   const [currentAdmission, setCurrentAdmission] = useState({});
-  const [openDrawer, setOpenDrawer] = useState();
-  const [searchData, setSearchData] = useState();
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [searchData, setSearchData] = useState("");
   const [clicked, setClicked] = useState(false);
   const navigate = useNavigate();
   const { confirm } = Modal;
@@ -35,15 +44,17 @@ function TableAdmissions(props) {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
+
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
   };
 
-  const showhowConfirm = () => {
+  const showConfirm = () => {
     confirm({
-      title: "Xoá chương trình ",
-      content: "Việc này sẽ xóa chương trình được chọn. Bạn có chắc chắn muốn xóa?",
+      title: "Xoá chương trình",
+      content:
+        "Việc này sẽ xóa chương trình được chọn. Bạn có chắc chắn muốn xóa?",
       onOk: handleDeleteAll,
       onCancel() {
         console.log("Cancel");
@@ -59,15 +70,14 @@ function TableAdmissions(props) {
     setClicked(open);
   };
 
-  // Hàm lấy thông tin Tin Tức
   const handleGetAdmission = () => {
     setLoading(true);
     getListAdmissions().then((res) => {
-      setDataAdmission(res?.data?.data?.items);
+      setDataAdmission(res?.data?.data?.items || []);
+      setLoading(false);
     });
   };
 
-  // delete each admission
   const handleDelAdmission = (id) => {
     deleteAdmission(id).then((res) => {
       if (res.status === 200) {
@@ -75,7 +85,7 @@ function TableAdmissions(props) {
       }
     });
   };
-  const hasSelected = selectedRowKeys.length > 0;
+
   const handleDeleteAll = () => {
     delAllAdmissions(selectedRowKeys)
       .then((res) => {
@@ -104,11 +114,8 @@ function TableAdmissions(props) {
     });
   };
 
-  // Hàm lọc người dùng
   const handleFilter = (values) => {
-    console.log("values:: ", values);
     filterAdmissions(values).then((res) => {
-      console.log("res", res);
       if (res?.status === 200) {
         setDataAdmission(res?.data?.data?.items);
       }
@@ -117,7 +124,6 @@ function TableAdmissions(props) {
 
   useEffect(() => {
     handleGetAdmission();
-    setLoading(false);
   }, []);
 
   const columns = [
@@ -134,16 +140,25 @@ function TableAdmissions(props) {
       dataIndex: "description",
       ellipsis: true,
     },
-
     {
       title: "Ảnh",
       dataIndex: "image",
       render: (imageURL) => (
-        <img
-          src={imageURL}
-          alt={imageURL}
-          style={{ width: "150px", height: "150px" }}
-        />
+        <div style={{ textAlign: "center" }}>
+          <img
+            src={imageURL || "https://via.placeholder.com/150"}
+            alt="Program Image"
+            style={{
+              width: "120px",
+              height: "120px",
+              objectFit: "cover",
+              borderRadius: "8px",
+              border: "1px solid #d9d9d9",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+            }}
+            onError={(e) => (e.target.src = "https://via.placeholder.com/150")}
+          />
+        </div>
       ),
     },
     {
@@ -174,45 +189,51 @@ function TableAdmissions(props) {
       title: "Ngày cập nhật",
       dataIndex: "updateDate",
     },
-
     {
       title: "Action",
       key: "action",
-      render: (e, record, idx) => (
+      render: (_, record) => (
         <Space>
-          <Button
-            className="update"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setCurrentAdmission(record);
-              setOpenModal(true);
-            }}
-          ></Button>
-          <Button
-            className="delete"
-            icon={<DeleteOutlined />}
-            onClick={() => {
-              handleDelAdmission(record.id);
-            }}
-          ></Button>
-          <Button
-            className="detail"
-            icon={<SolutionOutlined />}
-            onClick={() => {
-              setOpenDrawer(true);
-              navigate(`/adminpage/admissions/detailadmission/${record.id}`);
-            }}
-          ></Button>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              className="update"
+              icon={<EditOutlined />}
+              onClick={() => {
+                setCurrentAdmission(record);
+                setOpenModal(true);
+              }}
+            />
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <Button
+              className="delete"
+              icon={<DeleteOutlined />}
+              onClick={() => {
+                handleDelAdmission(record.id);
+              }}
+            />
+          </Tooltip>
+          <Tooltip title="Chi tiết">
+            <Button
+              className="detail"
+              icon={<SolutionOutlined />}
+              onClick={() => {
+                setOpenDrawer(true);
+                navigate(`/adminpage/admissions/detailadmission/${record.id}`);
+              }}
+            />
+          </Tooltip>
         </Space>
       ),
     },
   ];
+
   return (
     <div>
       <PageContainer
         title="Chương trình"
         extra={[
-          <Space>
+          <Space key="header-actions">
             <Button
               className="bg-1677ff text-white hover:bg-white"
               onClick={() => {
@@ -221,12 +242,10 @@ function TableAdmissions(props) {
             >
               + Thêm chương trình
             </Button>
-            ,
             <Input.Search
               placeholder="Nhập tiêu đề chương trình"
               onChange={handleSearch}
               value={searchData}
-              defaultValue={null}
               onSearch={(values) => {
                 handleSearchAdmission(values);
               }}
@@ -252,7 +271,6 @@ function TableAdmissions(props) {
           </Space>,
         ]}
       >
-        {/* Hàm tạo + Edit */}
         <AddEditAdmission
           onSuccess={() => {
             handleGetAdmission();
@@ -274,16 +292,16 @@ function TableAdmissions(props) {
           dataSource={dataAdmission}
           size="middle"
           pagination={{
-            pageSize: 3,
+            pageSize: 5,
           }}
           scroll={{
-            y: 413,
+            y: 400,
           }}
-          // loading={loading}
+          loading={loading}
         />
         <Drawer
-          title="Thông tin chi tiết chương trình "
-          width={1000}
+          title="Thông tin chi tiết chương trình"
+          width={800}
           open={openDrawer}
           onClose={() => {
             navigate("/adminpage/admissions");
@@ -294,13 +312,13 @@ function TableAdmissions(props) {
         </Drawer>
         <div
           className="absolute bottom-6"
-          style={{ display: hasSelected ? "block" : "none" }}
+          style={{ display: selectedRowKeys.length > 0 ? "block" : "none" }}
         >
           <>Đã chọn {selectedRowKeys.length}</>
           <Button
             className="bg-white ml-2.5 py-1 px-2.5"
             onClick={() => {
-              showhowConfirm();
+              showConfirm();
             }}
             disabled={selectedRowKeys.length === 0}
           >

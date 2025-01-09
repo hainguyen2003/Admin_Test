@@ -129,12 +129,20 @@ function Sidebar(props) {
         navigate("/adminpage/eduprogram");
       },
     },
+    // {
+    //   label: "Đăng ký khóa học",
+    //   key: "6",
+    //   icon: <ReadOutlined />,
+    //   onClick: () => {
+    //     navigate("/adminpage/courseRegister1");
+    //   },
+    // },
     {
-      label: "Đăng ký khóa học",
-      key: "6",
+      label: "Đăng ký tư vấn",
+      key: "5",
       icon: <ReadOutlined />,
       onClick: () => {
-        navigate("/adminpage/courseRegister1");
+        navigate("/adminpage/consultingRegister");
       },
     },
 

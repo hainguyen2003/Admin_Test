@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/alt-text */
-import { Button, Drawer, Modal, Space, Table } from "antd";
+import { Button, Drawer, Modal, Space, Table, Tooltip, Card } from "antd";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getListDisplay } from "../../../../Services/lead";
@@ -8,32 +8,32 @@ import { PageContainer } from "@ant-design/pro-components";
 import EditDisplay from "../../../AddEdit/EditDisplayManager/EditDisplay";
 import DetailDisplay from "../../../Details/DetailDisplay/DetailDisplay";
 
-function DisplayPages(props) {
+function DisplayPages() {
   const [loading, setLoading] = useState(true);
-  const [openDrawer, setOpenDrawer] = useState();
-  const [openModal, setOpenModal] = useState();
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
   const [data, setData] = useState([]);
   const [currentData, setCurrentData] = useState({});
   const navigate = useNavigate();
 
-  // getAll
-  const handleGetPages = () => {
-    getListDisplay().then((res) => {
-      setData(res?.data?.data?.items);
-    });
+  // Fetch all display data
+  const handleGetPages = async () => {
+    const res = await getListDisplay();
+    setData(res?.data?.data?.items || []);
+    setLoading(false);
   };
 
   const dataPages = data.filter((pages) => pages.type === "PAGES");
 
   useEffect(() => {
     handleGetPages();
-    setLoading(false);
   }, []);
 
   const columns = [
     {
-      title: "Tiêu đề ",
+      title: "Tiêu đề",
       dataIndex: "title",
+      render: (text) => <strong>{text}</strong>,
     },
     {
       title: "Ảnh",
@@ -41,12 +41,17 @@ function DisplayPages(props) {
       render: (imageURL) => (
         <img
           src={imageURL}
-          alt={imageURL}
-          style={{ width: "100px", height: "100px" }}
+          onError={(e) => (e.target.src = "https://via.placeholder.com/100")}
+          style={{
+            width: "100px",
+            height: "100px",
+            objectFit: "cover",
+            borderRadius: "8px",
+            border: "1px solid #d9d9d9",
+          }}
         />
       ),
     },
-
     {
       title: "Vị trí ảnh",
       dataIndex: "location",
@@ -54,51 +59,54 @@ function DisplayPages(props) {
     {
       title: "Loại",
       dataIndex: "type",
+      render: (type) => (
+        <span style={{ color: type === "PAGES" ? "green" : "blue" }}>
+          {type}
+        </span>
+      ),
     },
-
     {
-      title: "Action",
+      title: "Hành động",
       key: "action",
-      render: (e, record, idx) => (
+      render: (record) => (
         <Space>
-          <Button
-            className="update"
-            icon={<EditOutlined />}
-            onClick={() => {
-              setCurrentData(record);
-              setOpenModal(true);
-            }}
-          ></Button>
-          <Button
-            className="detail"
-            icon={<SolutionOutlined />}
-            onClick={() => {
-              console.log("drawer");
-              setOpenDrawer(true);
-              navigate(
-                `/adminpage/displaypages/detaildisplaypages/${record.id}`
-              );
-            }}
-          ></Button>
+          <Tooltip title="Chỉnh sửa">
+            <Button
+              className="update"
+              icon={<EditOutlined />}
+              onClick={() => {
+                setCurrentData(record);
+                setOpenModal(true);
+              }}
+            />
+          </Tooltip>
+          <Tooltip title="Xem chi tiết">
+            <Button
+              className="detail"
+              icon={<SolutionOutlined />}
+              onClick={() => {
+                setCurrentData(record);
+                setOpenDrawer(true);
+              }}
+            />
+          </Tooltip>
         </Space>
       ),
     },
   ];
+
   return (
     <div>
       <PageContainer
-        title="Quản lý hiển thị chung của các pages"
-        extra={[
-          <Space>
-            <Button
-              onClick={() => {
-                navigate("/adminpage/displayslide");
-              }}
-            >
-              Quản lý Slide
-            </Button>
-          </Space>,
-        ]}
+        title="Quản lý hiển thị chung của các trang"
+        extra={
+          <Button
+            type="primary"
+            onClick={() => navigate("/adminpage/displayslide")}
+          >
+            Quản lý Slide
+          </Button>
+        }
       >
         <EditDisplay
           onSuccess={() => {
@@ -114,28 +122,52 @@ function DisplayPages(props) {
           }}
           data={currentData}
         />
+
         <Drawer
-          title="Thông tin chi tiết "
-          width={500}
+          title="Thông tin chi tiết"
+          width={600}
           open={openDrawer}
-          onClose={() => {
-            setOpenDrawer(false);
-          }}
+          onClose={() => setOpenDrawer(false)}
         >
-          <DetailDisplay />
+          <Card
+            title={currentData.title}
+            bordered={false}
+            cover={
+              <img
+                alt="example"
+                src={currentData.image}
+                style={{
+                  width: "100%",
+                  height: "200px",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+                onError={(e) =>
+                  (e.target.src = "https://via.placeholder.com/600x200")
+                }
+              />
+            }
+          >
+            <p>
+              <strong>Vị trí ảnh:</strong> {currentData.location}
+            </p>
+            <p>
+              <strong>Loại:</strong> {currentData.type}
+            </p>
+          </Card>
         </Drawer>
+
         <Table
-          rowKey={"id"}
+          rowKey="id"
           columns={columns}
           dataSource={dataPages}
           size="middle"
           pagination={{
             pageSize: 5,
-          }}
-          scroll={{
-            y: 413,
+            showSizeChanger: true,
           }}
           loading={loading}
+          scroll={{ y: 413 }}
         />
       </PageContainer>
     </div>
