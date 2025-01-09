@@ -26,7 +26,6 @@ function TableClass() {
   const onSelectChange = (newSelectedRowKeys) => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
-
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
@@ -112,11 +111,16 @@ function TableClass() {
             icon={<DeleteOutlined />}
             onClick={() => {
               Modal.confirm({
-                title: `Bạn muốn xóa đơn hàng ${record.className} này không?`,
+                title: `Bạn có chắc chắn muốn xóa lớp học ${record.className}?`,
+                content: "Thao tác này sẽ không thể hoàn tác.",
                 okText: "Xác nhận",
                 cancelText: "Hủy",
-                onOk: () => handleDelete(record.id),
-                onCancel: () => console.log("Hủy xóa"),
+                onOk: () => {
+                  handleDelete(record.classId); // Gọi hàm xóa khi nhấn "Xác nhận"
+                },
+                onCancel: () => {
+                  console.log("Hủy xóa lớp học");
+                },
               });
             }}
           ></Button>
@@ -174,14 +178,15 @@ function TableClass() {
         data={currentData}
       />
       <Table
-        rowKey={"id"}
-        rowSelection={rowSelection}
+        rowKey={(record) => record.classId}
+        // rowSelection={rowSelection}
         columns={columns}
         dataSource={data}
         size="middle"
         pagination={{
           pageSize: 5,
         }}
+        loading={loading}
       />
       {showDetail && (
         <DetailClass
@@ -201,9 +206,7 @@ function TableClass() {
             confirm({
               title: "Xóa lớp học",
               content: "Bạn có chắc chắn muốn xóa các lớp học đã chọn?",
-              onOk: () => {
-                console.log("Xóa các lớp học: ", selectedRowKeys);
-              },
+              onOk: handleDelete,
               onCancel: () => {
                 console.log("Hủy xóa");
               },

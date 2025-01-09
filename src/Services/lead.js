@@ -597,12 +597,30 @@ export const updateClass = (id, values) => {
   return axios.put(`/classRoom/update/${id}`, values);
 };
 
-// Delete each Class
 export const deleteClass = (id) => {
   return axios.delete(`/classRoom/delete/${id}`);
 };
 
+export const getInforClassByCourseId = (id) => {
+  return axios.get(`/classRoom/by-course/${id}`);
+};
+
+// get all class user
+export const getClassUser = () => {
+  return axios.get(`/class-user/all`);
+};
+
+//  get detail Class
+export const getClassesByUserId = (id) => {
+  return axios.get(`/class-user/user/${id}`);
+};
 // create user class
 export const createClassUser = (values) => {
   return axios.post("/class-user/create", values);
+};
+
+// update user class
+
+export const updateUserClass = (id, values) => {
+  return axios.put(`/class-user/${id}`, values);
 };
